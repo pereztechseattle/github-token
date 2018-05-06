@@ -36,6 +36,23 @@ contract GithubToken is Pausable, Destructible {
       addProject('github.com/github-token', 1);
   }
 
+  function sell(string _url, uint _numShares) public returns (bool) {
+    require (_numShares <= sharesByOwnerByProjectUrl[_url][msg.sender]);
+    
+    sharesByOwnerByProjectUrl[_url][msg.sender] = sharesByOwnerByProjectUrl[_url][msg.sender].sub(_numShares);
+
+    numSharesByProjectUrl[_url] = numSharesByProjectUrl[_url].sub(_numShares);
+    
+    uint value = _computeValueForShares(numStarsByProjectUrl[_url], _numShares);
+
+    totalValueByProjectUrl[_url] = totalValueByProjectUrl[_url].sub(value);
+    
+    // recompute share value
+    shareValueByProjectUrl[_url] = totalValueByProjectUrl[_url].div(numSharesByProjectUrl[_url]);
+
+    return msg.sender.send(value);
+  }
+
   function buy(string _url) public payable returns (bool) { 
 
     uint nshares = _computeNumShares(numStarsByProjectUrl[_url], msg.value);
@@ -52,10 +69,16 @@ contract GithubToken is Pausable, Destructible {
     return true;
   }
   
-  function addProject(string _url, uint _numStars) public payable returns (bool) {
-      // keep list of indices for looping      
-      // projects.push(_url);
+  function updateProject(string _url, uint _numStars) public returns (bool) {
+      totalStars = totalStars.sub(numStarsByProjectUrl[_url]).add(_numStars);
+      assert(totalStars >= _numStars);
 
+      numStarsByProjectUrl[_url] = _numStars;
+
+      return true;
+  }
+
+  function addProject(string _url, uint _numStars) public payable returns (bool) {
       totalStars = totalStars.add(_numStars);
       assert(totalStars >= _numStars);
 
@@ -67,6 +90,10 @@ contract GithubToken is Pausable, Destructible {
   // @dev assumes _numStars already included in total
   function _computeNumShares(uint _numStars, uint _value) view internal returns (uint) {
     return (_value * (totalStars.mul(1000) / _numStars)).div(10 ** 15); 
+  }
+
+  function _computeValueForShares(uint _numStars, uint _numShares) view internal returns (uint) {
+    return (_numShares / (totalStars.mul(1000) / _numStars)).div(10 ** 15); 
   }
 
   function getBalance() view public returns (uint) {

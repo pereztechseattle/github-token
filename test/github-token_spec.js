@@ -86,13 +86,51 @@ contract('GithubToken', async (accounts) => {
 
     it('should calculate the correct total num of shares', async () => {
       let totalNumShares = await theContract.getTotalNumShares(projectUrl);
-      expect(totalNumShares.toString()).to.equal('2222');
+      expect(totalNumShares.toNumber()).to.equal(2222);
     })
 
     it('should calculate the correct price per share', async () => {
       // 2 finney / 2222 = 900090009000
       let price = await theContract.getShareValue(projectUrl);
       expect(price.toString()).to.equal('900090009000');
+    })
+  })
+
+  describe('update the project score', async () => {
+    const projectUrl = 'testprojecta'
+
+    it('should get a recipt ok', async () => {
+      // from 90% to 67%
+      let receipt = await theContract.updateProject(projectUrl, 2);
+      assert.ok(receipt)
+    })
+  })
+
+  describe('the same user sells half of their shares', async () => {
+    const projectUrl = 'testprojecta'
+
+    it('should get a recipt ok', async () => {
+      const numToSell = await theContract.getNumShares(projectUrl, userb);
+
+      // from 90% to 67%
+      let receipt = await theContract.sell(projectUrl, numToSell / 2, { from: userb });
+      assert.ok(receipt)
+    })
+
+    it('should leave the user with the appropriate number of shares', async () => {
+      // 50% * 1111 shares = 555.5 shares
+      let shares = await theContract.getNumShares(projectUrl, userb);
+      expect(shares.toNumber()).to.equal(556);
+    })
+
+    it('should calculate the correct total num of shares', async () => {
+      // userb has half the projectb which is 2 finney so 2222 * 0.75 = 1666.5
+      let totalNumShares = await theContract.getTotalNumShares(projectUrl);
+      expect(totalNumShares.toNumber()).to.equal(1667);
+    })
+
+    it('should send 123 to the user address', async () => {
+      // 
     })
   })
 })
