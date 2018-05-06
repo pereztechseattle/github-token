@@ -92,8 +92,8 @@ contract GithubToken is Pausable, Destructible {
     return (_value * (totalStars.mul(1000) / _numStars)).div(10 ** 15); 
   }
 
-  function _computeValueForShares(uint _numStars, uint _numShares) view internal returns (uint) {
-    return (_numShares / (totalStars.mul(1000) / _numStars)).div(10 ** 15); 
+  function _computeValueForShares(uint _numStars, uint _numShares) view public returns (uint) {
+    return (_numShares / (totalStars.mul(1000) / _numStars)).mul(10 ** 15);
   }
 
   function getBalance() view public returns (uint) {

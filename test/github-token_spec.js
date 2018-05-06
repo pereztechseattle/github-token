@@ -11,9 +11,6 @@ const promisify = (inner) =>
     })
   )
 
-const getBalance = (account) =>
-  promisify(cb => web3.eth.getBalance(account, 'latest', cb))
-
 contract('GithubToken', async (accounts) => {
   const MINUTE = 60
   const HOUR = 60 * MINUTE
@@ -108,6 +105,7 @@ contract('GithubToken', async (accounts) => {
 
   describe('the same user sells half of their shares', async () => {
     const projectUrl = 'testprojecta'
+    let balanceBefore = web3.eth.getBalance(userb)
 
     it('should get a recipt ok', async () => {
       const numToSell = await theContract.getNumShares(projectUrl, userb);
@@ -130,7 +128,8 @@ contract('GithubToken', async (accounts) => {
     })
 
     it('should send 123 to the user address', async () => {
-      // 
+      let balanceAfter = web3.eth.getBalance(userb)
+      expect(balanceAfter).to.not.equal(balanceBefore);
     })
   })
 })
