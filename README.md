@@ -13,9 +13,9 @@ For simplicity, say we're just tracking two projects - projecta and projectb.  T
 
 Q: How much is one share of projecta worth?  projectb?
 
-Initial share value = Total Project Value / Project Score.  Example for projectb:
+Initial num shares = Total Project Value / Project Score.  Example for projectb:
 
-`I = 1 ETH / 0.1 = 10 shares`
+`I = 1000000000000000000 / 0.1 = 10000000000000000000 shares`  WTF?
 
 For projecta:
 
@@ -25,7 +25,7 @@ Q: How many shares outstanding of each project?
 
 User wants to buy 1 ETH worth of projectb.  How many shares of projectb should the user be awarded?
 
-`shares = value / p = 1 / 0.1 = 10`
+`shares = msg.value / p = 1 / 0.1 = 10`
 
 After the transaction, the state is:  
 

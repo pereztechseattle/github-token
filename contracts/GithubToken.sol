@@ -11,39 +11,81 @@ import "./solidity-stringutils/strings.sol";
  */
 contract GithubToken is Pausable, Destructible {
 
-  using strings for *;
-
   using SafeMath for uint256;
 
-  uint public _totalStars;
+  string[] public projects;
 
-  mapping (bytes => uint) scoreInverseByProjectUrl;
+  // sum of all numStarsByProjectUrl values  
+  uint public totalStars;
 
-  mapping (bytes => mapping (address => uint)) sharesByOwnerByProjectUrl;
+  // num stars for each project
+  mapping (string => uint) numStarsByProjectUrl;
+
+  // total num shares for each project
+  mapping (string => uint) numSharesByProjectUrl;  
 
   // value of each project's share in wei
-  mapping (bytes => uint) shareValueByProjectUrl;
+  mapping (string => uint) shareValueByProjectUrl;
 
-  event LogOraclizeQuery(string _result);
+  // total value of all shares for each project in wei
+  mapping (string => uint) totalValueByProjectUrl;
 
-  event LogCallback(string _result);
+  mapping (string => mapping (address => uint)) sharesByOwnerByProjectUrl;
 
-  function addProject(bytes url, uint numStars) public payable returns (bool) {
-      _totalStars = _totalStars.add(numStars);
-
-      assert(_totalStars >= numStars);
-
-      // avoid floating point by using the inverse
-      scoreInverseByProjectUrl[url] = _totalStars.div(numStars);
-
-      sharesByOwnerByProjectUrl[url][msg.sender] = _computeInitialShares(url);
+  function GithubToken() public payable {
+      addProject('github.com/github-token', 1);
   }
 
-  function _computeInitialShares(bytes url) internal returns (uint) {
-      uint balance = address(this).balance;
+  function buy(string _url) public payable returns (bool) { 
 
-      assert (scoreInverseByProjectUrl[url] > 0);
+    uint nshares = _computeNumShares(numStarsByProjectUrl[_url], msg.value);
+    assert(nshares > 0);
 
-      return balance.div(scoreInverseByProjectUrl[url]);
+    numSharesByProjectUrl[_url] = numSharesByProjectUrl[_url].add(nshares);
+    
+    totalValueByProjectUrl[_url] = totalValueByProjectUrl[_url].add(msg.value);
+    
+    sharesByOwnerByProjectUrl[_url][msg.sender] = nshares;
+
+    shareValueByProjectUrl[_url] = totalValueByProjectUrl[_url].div(numSharesByProjectUrl[_url]);
+
+    return true;
+  }
+  
+  function addProject(string _url, uint _numStars) public payable returns (bool) {
+      // keep list of indices for looping      
+      // projects.push(_url);
+
+      totalStars = totalStars.add(_numStars);
+      assert(totalStars >= _numStars);
+
+      numStarsByProjectUrl[_url] = _numStars;
+
+      return buy(_url);
+  }
+
+  // @dev assumes _numStars already included in total
+  function _computeNumShares(uint _numStars, uint _value) view internal returns (uint) {
+    return (_value * (totalStars.mul(1000) / _numStars)).div(10 ** 15); 
+  }
+
+  function getBalance() view public returns (uint) {
+    return address(this).balance;
+  }
+  
+  function getNumShares(string _url, address _owner) view public returns (uint) {
+      return sharesByOwnerByProjectUrl[_url][_owner];
+  }
+
+  function getTotalValue(string _url) view public returns (uint) {
+      return totalValueByProjectUrl[_url];
+  }
+
+  function getShareValue(string url) view public returns (uint) {
+      return shareValueByProjectUrl[url];
+  }
+
+  function getTotalNumShares(string _url) view public returns (uint) {
+      return numSharesByProjectUrl[_url];
   }
 }

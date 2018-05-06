@@ -45,27 +45,55 @@ contract('GithubToken', async (accounts) => {
   })
 
   describe('adding a project', async () => {
-    it('should award the sender the appropriate number of shares for the project', async () => {
-      let receipt = await theContract.addProject('github.com/pereztechseattle/github-token', 9)
+    const projectUrl = 'testprojecta'
 
-      assert.ok(receipt);
+    it('should get a recipt ok', async () => {
+      let receipt = await theContract.addProject(projectUrl, 9, { from: usera, value: web3.toWei(1, 'finney') })
+      assert.ok(receipt)
+    })
+
+    it('should update total num stars', async () => {            
+      let totalStars = await theContract.totalStars.call();
+      expect(totalStars.toNumber()).to.equal(10);
+    })
+
+    it('should award the sender the appropriate number of shares', async () => {            
+      // 90% * 1 finney = 1.1 * 1000 = 1111 shares
+      let shares = await theContract.getNumShares(projectUrl, usera);
+      expect(shares.toNumber()).to.equal(1111);
     })
 
     it('should calculate the correct price per share', async () => {
-      
+      // 1 finney / 1111 = 900090009000
+      let price = await theContract.getShareValue(projectUrl);
+      expect(price.toString()).to.equal('900090009000');
+    })
+  })
+
+  describe('new user contributing to the same project', async () => {
+    const projectUrl = 'testprojecta'
+
+    it('should get a recipt ok', async () => {
+      let receipt = await theContract.buy(projectUrl, { from: userb, value: web3.toWei(1, 'finney') })
+      assert.ok(receipt)
     })
 
-    // it('should have a 1 finney minimum bet', async () => {
-    //   let minimumBet = await theContract.minimumBet.call()
+    it('should award the sender the appropriate number of shares', async () => {
+      // 90% * 1 finney = 1.1 * 1000 = 1111 shares
+      let shares = await theContract.getNumShares(projectUrl, usera);
+      expect(shares.toNumber()).to.equal(1111);
+    })
 
-    //   expect(minimumBet.valueOf()).to.equal(web3.toWei(1, 'finney'))
-    // })
+    it('should calculate the correct total num of shares', async () => {
+      let totalNumShares = await theContract.getTotalNumShares(projectUrl);
+      expect(totalNumShares.toString()).to.equal('2222');
+    })
 
-    // it('should be endowed with 10 Ether', async () => {
-    //   let balance = await getBalance(GithubToken.address)
-
-    //   expect(balance.toString()).to.equal(web3.toWei(10, 'ether'))
-    // })
+    it('should calculate the correct price per share', async () => {
+      // 2 finney / 2222 = 900090009000
+      let price = await theContract.getShareValue(projectUrl);
+      expect(price.toString()).to.equal('900090009000');
+    })
   })
 })
 
