@@ -12,12 +12,6 @@ const promisify = (inner) =>
   )
 
 contract('GithubToken', async (accounts) => {
-  const MINUTE = 60
-  const HOUR = 60 * MINUTE
-  const DAY = 24 * HOUR
-  const MONTH = 30 * DAY
-  const YEAR = 12 * MONTH
-
   let now
   let deployer = accounts[0]
   let usera = accounts[1]
@@ -105,7 +99,7 @@ contract('GithubToken', async (accounts) => {
 
   describe('the same user sells half of their shares', async () => {
     const projectUrl = 'testprojecta'
-    let balanceBefore = web3.eth.getBalance(userb)
+    let balanceBefore = web3.fromWei(web3.eth.getBalance(userb), 'finney')
 
     it('should get a recipt ok', async () => {
       const numToSell = await theContract.getNumShares(projectUrl, userb);
@@ -128,7 +122,7 @@ contract('GithubToken', async (accounts) => {
     })
 
     it('should send 123 to the user address', async () => {
-      let balanceAfter = web3.eth.getBalance(userb)
+      let balanceAfter = web3.fromWei(web3.eth.getBalance(userb), 'finney')
       expect(balanceAfter).to.not.equal(balanceBefore);
     })
   })
@@ -138,7 +132,7 @@ contract('GithubToken', async (accounts) => {
  * Helper to wait for log emission.
  * @param  {Object} _event The event to wait for.
  */
-function promisifyLogWatch(_event) {
+function promisifyLogWatch (_event) {
   return new Promise((resolve, reject) => {
     _event.watch((error, log) => {
       _event.stopWatching()
@@ -148,3 +142,25 @@ function promisifyLogWatch(_event) {
     })
   })
 }
+
+/**
+ * Returns a hash code for a string.
+ * (Compatible to Java's String.hashCode())
+ *
+ * The hash code for a string object is computed as
+ *     s[0]*31^(n-1) + s[1]*31^(n-2) + ... + s[n-1]
+ * using number arithmetic, where s[i] is the i th character
+ * of the given string, n is the length of the string,
+ * and ^ indicates exponentiation.
+ * (The hash value of the empty string is zero.)
+ *
+ * @param {string} s a string
+ * @return {number} a hash code value for the given string.
+ */
+function hashCode (s) {
+  var h = 0, l = s.length, i = 0;
+  if ( l > 0 )
+    while (i < l)
+      h = (h << 5) - h + s.charCodeAt(i++) | 0;
+  return h;
+};

@@ -32,9 +32,7 @@ contract GithubToken is Pausable, Destructible {
 
   mapping (string => mapping (address => uint)) sharesByOwnerByProjectUrl;
 
-  function GithubToken() public payable {
-      addProject('github.com/github-token', 1);
-  }
+  event ProjectUpdated(string url, uint score, uint totalShares, uint totalValue, uint price);
 
   function sell(string _url, uint _numShares) public returns (bool) {
     require (_numShares <= sharesByOwnerByProjectUrl[_url][msg.sender]);
@@ -75,6 +73,8 @@ contract GithubToken is Pausable, Destructible {
 
       numStarsByProjectUrl[_url] = _numStars;
 
+      emit ProjectUpdated(_url, _numStars.mul(1000) / totalStars, numSharesByProjectUrl[_url], totalValueByProjectUrl[_url], shareValueByProjectUrl[_url]);
+
       return true;
   }
 
@@ -92,7 +92,7 @@ contract GithubToken is Pausable, Destructible {
     return (_value * (totalStars.mul(1000) / _numStars)).div(10 ** 15); 
   }
 
-  function _computeValueForShares(uint _numStars, uint _numShares) view public returns (uint) {
+  function _computeValueForShares(uint _numStars, uint _numShares) view internal returns (uint) {
     return (_numShares / (totalStars.mul(1000) / _numStars)).mul(10 ** 15);
   }
 
