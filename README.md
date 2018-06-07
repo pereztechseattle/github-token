@@ -37,7 +37,7 @@ When the user sells back their 10 shares of projectb, we simply reverse the oper
 
 `10 * 0.2 = 2 ETH`
 
-*So the user's value has doubled, which is what we would expect.*
+**So the user's value has doubled, which is what we would expect.**
 
 We can also derive a price for the project by:
 
