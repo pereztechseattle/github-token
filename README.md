@@ -1,10 +1,12 @@
 # github-token
+[This is a work in progress]
+
 A smart contract for github.com stats derived tokens.  The value of each project's "shares" will depend on the metrics of the associated project on github.com.  More stars, forks, 
 commits, etc. should result in the value of that project's shares going up.  Shares can be bought and sold between the user and the contract, not between users.  This is sort of 
 like an ongoing categorized prediction market.
 
 ## Calculating value
-
+[TBD]
 ## Example
 
 For simplicity, say we're just tracking two projects - projecta and projectb.  The project scores (summing to 1) and contract balance are:
