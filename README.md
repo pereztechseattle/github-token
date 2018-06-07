@@ -1,5 +1,5 @@
 # github-token
-[This is a work in progress]
+[This is a work in progress and a proof of concept]
 
 A smart contract for github.com stats derived tokens.  The value of each project's "shares" will depend on the metrics of the associated project on github.com.  More stars, forks, 
 commits, etc. should result in the value of that project's shares going up.  Shares can be bought and sold between the user and the contract, not between users.  This is sort of 
