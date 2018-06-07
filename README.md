@@ -13,11 +13,7 @@ For simplicity, say we're just tracking two projects - projecta and projectb.  T
 
 Q: How much is one share of projecta worth?  projectb?
 
-Initial num shares = Total Project Value / Project Score.  Example for projectb:
-
-`I = 1000000000000000000 / 0.1 = 10000000000000000000 shares`  WTF?
-
-For projecta:
+Initial num shares = Total Project Value / Project Score.  Example for projecta:
 
 `I = 9 ETH / 0.9 = 10`
 
