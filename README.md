@@ -13,7 +13,7 @@ For simplicity, say we're just tracking two projects - projecta and projectb.  T
 
 `projecta=0.9, projectb=0.1, bal=10 ETH`
 
-Q: How much is one share of projecta worth?  projectb?
+Q: How much is one share of projecta worth?
 
 Initial num shares = Total Project Value / Project Score.  Example for projecta:
 
